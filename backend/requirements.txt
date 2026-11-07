@@ -1,0 +1,7 @@
+flask==3.0.3
+gunicorn==22.0.0
+itsdangerous==2.2.0
+azure-identity==1.17.1
+azure-storage-blob==12.22.0
+azure-storage-queue==12.10.0
+azure-data-tables==12.5.0
