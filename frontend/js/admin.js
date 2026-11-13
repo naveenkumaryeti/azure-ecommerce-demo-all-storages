@@ -21,7 +21,8 @@ async function runConsumer(fail_) { try { const r = await api("/admin/queue/run"
 async function reconcile() { try { const r = await api("/admin/reconcile", {method: "POST"}); $("#runout").textContent = "reconcile: " + JSON.stringify(r.fixed); loadAll(); } catch (e) { fail(e); } }
 document.addEventListener("DOMContentLoaded", async () => {
   renderNav("admin.html"); if (!requireRole("admin", "seller")) return;
-  if (Auth.user.role !== "admin") document.querySelectorAll(".admin-only").forEach(e => e.remove());
-  $("#run").onclick = () => runConsumer(false); $("#runfail").onclick = () => runConsumer(true); $("#rec").onclick = reconcile; $("#refresh").onclick = loadAll;
+  $("#refresh").onclick = loadAll;
+  if (Auth.user.role === "admin") { $("#run").onclick = () => runConsumer(false); $("#runfail").onclick = () => runConsumer(true); $("#rec").onclick = reconcile; }
+  else document.querySelectorAll(".admin-only").forEach(e => e.remove());   // seller sees only the order table
   try { await loadAll(); } catch (e) { fail(e); }
 });

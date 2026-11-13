@@ -21,6 +21,78 @@ az login             # skip if already logged in
 ```
 Then wait **2-5 minutes** for role and firewall propagation.
 
+# Azure Storage Access and Deployment Instructions
+
+## 1. Use Azure Cloud Shell for Commands
+
+1. Click the `>_` icon in the top bar of the Azure Portal.
+2. Cloud Shell is already signed in as `labtestuser45@gmail.com`.
+3. Confirm the active account and subscription using:
+
+```
+az account show --query "{user:user.name,sub:name}" -o table
+```
+
+4. Run `deploy.sh`, `test-storage.sh`, and the other project scripts from Cloud Shell.
+
+## 2. Allow Your PC's IP Address to Access Azure Storage
+
+To access Azure Storage directly through your browser, you must allow your PC's public IPv4 address.
+
+**Important:** The `storage-access.sh on` command previously executed in Cloud Shell added Cloud Shell's IP address, not your PC's IP address.
+
+### Steps
+
+1. On your PC, open [https://api.ipify.org](https://api.ipify.org).
+2. Copy your public IPv4 address.
+3. In Azure Cloud Shell, execute:
+
+```
+source env.sh
+
+az storage account network-rule add \
+  -g $RG \
+  --account-name $STORAGE_NAME \
+  --ip-address <your-pc-ipv4>
+```
+
+4. Make sure `./storage-access.sh on` was executed while signed in as `labtestuser45@gmail.com`.
+
+   **Note:** The Reader roles are assigned to whichever account is logged in when the script runs.
+5. Wait approximately 5 minutes for the firewall changes to take effect.
+6. Open your Storage Account in Azure Portal.
+7. Navigate to:
+   - Containers
+   - Queues
+   - Tables
+8. Select **Switch to Microsoft Entra user account**.
+
+## 3. If the Azure Portal Still Shows "Not Authorized"
+
+Your browser may be connecting to Azure Storage over IPv6 instead of IPv4.
+
+Your error log shows an IP address starting with `2401:…`, which indicates an IPv6 address.
+
+**Reason:** Azure Storage firewall IP network rules accept IPv4 addresses only.
+
+### Recommended Solution
+
+Use the application's built-in interface instead:
+
+1. Open your application.
+2. Navigate to **Admin → Azure Storage**.
+3. Access the storage resources through the application backend.
+
+The application backend reads the same Azure Storage resources:
+
+- Blobs
+- Queues
+- Tables
+
+This allows you to access Azure Storage without relying on direct browser access through the storage firewall.
+
+Clarify which account runs each commandAdd a quick access verification step
+
 ### Option B: manual commands (what the script does)
 ```bash
 ME=$(az ad signed-in-user show --query id -o tsv)
